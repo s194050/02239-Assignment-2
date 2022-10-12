@@ -6,7 +6,7 @@ public class PrinterServer {
 
     public static void main(String[] args) throws RemoteException {
         Registry registry = LocateRegistry.createRegistry(1099);
-        registry.rebind("HelloPrinter", new HelloClient("Server"));
+        registry.rebind("ClientToPrinter", new PrinterToClient("Server"));
 
     }
 
