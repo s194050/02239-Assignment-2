@@ -1,14 +1,26 @@
+package com.App;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import com.Domain.Pair;
 
-public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter {
-    private static final long serialVersionUID = 1L;
-    private String name;
+
+public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
+    private static final long serialVersionUID = 1L; // Serial version UID
+    private String name; // Name of the printer
+    private String status = "Idle"; // Status of the printer
+
+    private List<Pair> queue = new ArrayList<>(); // Queue for storing jobs
+
+
     public PrinterToClient(String name) throws RemoteException {
-        super();
+        super(); // Call to UnicastRemoteObject constructor
         this.name = name; // "Server"
-
     }
+
     public String echo(String input) throws RemoteException { // "Client"
         return "Hello " + input + " from " + name;
     }
