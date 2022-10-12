@@ -7,7 +7,7 @@ public class Client
 {
     public static void main( String[] args ) throws MalformedURLException, RemoteException, NotBoundException
     {
-        HelloPrinter printer = (HelloPrinter) Naming.lookup("rmi://localhost:1099/HelloPrinter"); 
+        ClientToPrinter printer = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/HelloPrinter"); 
         System.out.println("----" + printer.echo(" Server") + " " + printer.getClass().getName());
     }
 }
