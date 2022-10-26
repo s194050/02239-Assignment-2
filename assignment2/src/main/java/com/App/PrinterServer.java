@@ -9,11 +9,5 @@ public class PrinterServer { // Server for handling printer requests
         Registry registry = LocateRegistry.createRegistry(1099);
         registry.rebind("ClientToPrinter", new PrinterToClient("Server"));
         System.out.println("Server is running");
-    }
-
-    
-
-
-
-    
+    }    
 }
