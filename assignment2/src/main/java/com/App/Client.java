@@ -54,7 +54,7 @@ public class Client
             }
         }
 
-        while(run){
+        while(run){ // Run the main print functions of the server
             System.out.print("Server Options: \n \t\t 1: Start Server \t\t\t 2: Stop Server \t\t\t 3: Restart Server \n" +
                     "Printer Functions: \n \t\t 4: Print file \n \t\t 5: Print the job queue of a specific printer \n" +
                     "\t\t 6: Move a job on a specfic printer to the top of the queue \nConfig Options: \n" +
@@ -63,7 +63,7 @@ public class Client
 
             selection = Integer.parseInt(scanner.next() + scanner.nextLine());
             
-            switch (selection){
+            switch (selection){ // Handle the selection
                 case 1:
                     client1.Start();
                     break;
@@ -77,9 +77,8 @@ public class Client
                     getAvailablePrinters(client1, scanner); // Get available printers
                     System.out.println("Enter the name of the printer you want to print on: ");
 
-
                     String printer = scanner.next() + scanner.nextLine();
-                    if (client1.getPrinter(printer) == null){
+                    if (client1.getPrinter(printer) == null){ // If the printer doesn't exist, break
                         System.out.println("Printer does not exist, try again");
                         break;
                     }
@@ -95,7 +94,7 @@ public class Client
                     System.out.println("Enter the name of the printer you want to see the job queue of: ");
                     printer = scanner.next() + scanner.nextLine();
 
-                    if (client1.getPrinter(printer) == null){
+                    if (client1.getPrinter(printer) == null){ // Check if the printer exists
                         System.out.println("Printer does not exist, try again");
                         break;
                     }
@@ -106,7 +105,7 @@ public class Client
                     getAvailablePrinters(client1, scanner); // Get available printers
                     System.out.println("Enter the name of the printer you want to change the job queue of: ");
                     printer = scanner.next() + scanner.nextLine();
-                    if (client1.getPrinter(printer) == null){
+                    if (client1.getPrinter(printer) == null){ // Check if the printer exists
                         System.out.println("Printer does not exist, try again");
                         break;
                     }
@@ -114,7 +113,7 @@ public class Client
                     getAvailableJobs(client1, scanner, printer); // Get available jobs
                     System.out.println("Enter the job number you want to move to the top of the queue: ");
                     try {job = Integer.parseInt(scanner.next() + scanner.nextLine());} catch (NumberFormatException e) {
-                        System.out.println("Invalid input, try again");
+                        System.out.println("Invalid input, try again"); // If not an integer allow user to try again
                         break;
                     }
                     

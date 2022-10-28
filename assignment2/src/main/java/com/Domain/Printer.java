@@ -28,14 +28,6 @@ public class Printer {
         return -1; // Job not found
     }
 
-    public String getJobs(){
-        String jobs = "";
-        for(Pair pair : queue) {
-            jobs += pair.getJob() + " ";
-        }
-        return jobs;
-    }
-
     public String getStatus() { // Get printer status
         return status;
     }
@@ -54,9 +46,9 @@ public class Printer {
         return "File " + filename + " added to queue " + this.printerName+ " as job " + (jobNumber - 1) + "\n";
     }
 
-    public String queue(){
-    String queueString = "";
-        for (Pair pair : queue) {
+    public String queue(){ // Get the jobs added to the queue and turn all of them into a string for easy printing
+        String queueString = "";
+        for (Pair pair : queue) { // Iterate through queue
             queueString += pair.getJob() + " " + pair.getFilename() + "; ";
         }
         return queueString;
@@ -64,9 +56,9 @@ public class Printer {
 
     public String topQueue(int job) { // Move job to top of queue
         for (Pair pair : queue) {
-            if (pair.getJob() == job) {
-                queue.remove(pair);
-                queue.add(0, pair);
+            if (pair.getJob() == job) { // If job is found
+                queue.remove(pair); // Remove the job
+                queue.add(0, pair); // Add to to the front of the list, representing the Job queue
                 return "Job " + job + " moved to top of queue";
             }
         }
