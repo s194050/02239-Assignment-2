@@ -28,16 +28,31 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
     
     public String print(String filename, String printer){ // Print a file
-        return filename + " printed on " + printer;
+        for (Printer specficPrinter : printers) { // Loop through printers
+            if (specficPrinter.getPrinterName().equals(printer)) {
+                return specficPrinter.addToqueue(filename);
+            }
+        }
+        return null; // Printer not found
     }
 
 
-    public String queue(String printer) { 
-            return "added to queue" + "on printer: " + printer;
+    public String queue(String printer) { // Get queue for a printer
+        for (Printer specficPrinter : printers) { // Loop through printers
+            if (specficPrinter.getPrinterName().equals(printer)) {
+                return specficPrinter.queue();
+            }
+        }
+        return null; // Printer not found
     }
 
     public String topQueue(String printer, int job) { //job = job number in queue to be moved to top of queue 
-        return "job " + job + " moved to top of queue on printer: " + printer;
+        for (Printer specficPrinter : printers) { // Loop through printers
+            if (specficPrinter.getPrinterName().equals(printer)) {
+                return specficPrinter.topQueue(job);
+            }
+        }
+        return null; // Printer not found
     }
 
     public void Start() { //  start the print server
@@ -70,6 +85,36 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         
     }
 
+
+    public void addPrinter(String printerName) { // Add a printer
+        printers.add(new Printer(printerName));
+    }
+
+    public String getPrinter(String printerName) { // Get a printer
+        for (Printer printer : printers) {
+            if (printer.getPrinterName().equals(printerName)) {
+                return printer.getPrinterName();
+            }
+        }
+        return null;
+    }
+
+    public String getPrinters() { // Get all printers
+        String printerNames = "";
+        for (Printer printer : printers) {
+            printerNames += printer.getPrinterName() + " ";
+        }
+        return printerNames;
+    }
+
+    public int getJobID(int jobNumber, String printerName) { // Get job ID
+        for (Printer printer : printers) {
+            if (printer.getPrinterName().equals(printerName)) {
+                return printer.getJobNumber(jobNumber);
+            }
+        }
+        return -1;
+    }        
 }
     
 
