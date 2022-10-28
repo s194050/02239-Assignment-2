@@ -139,6 +139,7 @@ public class Client
                     break;
                 case 9:
                     run = false;
+                    System.out.println("Thanks for using the print server");
                     break;
                 default:
                     System.out.println("Invalid selection");

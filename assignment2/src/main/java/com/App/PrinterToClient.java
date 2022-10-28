@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
-
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import com.Domain.Pair;
 import com.Domain.Printer;
 
@@ -145,12 +147,37 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 FileWriter fstream = new FileWriter(file, true);
                 BufferedWriter out = new BufferedWriter(fstream);
                 // Write to file and make a new line. 
-                int hash = password.hashCode();
-                out.write(username + ":" + hash);
-                out.newLine();
-                //Close the output stream
-                out.close();
-                return "Account with Username: " + username + " created successfully." + "\n";
+                try {
+                    // getInstance() method is called with algorithm SHA-512
+                    MessageDigest md = MessageDigest.getInstance("SHA-512");
+                    // digest() method is called
+                    // to calculate message digest of the input string
+                    // returned as array of byte
+                    byte[] messageDigest = md.digest(password.getBytes());
+          
+                    // Convert byte array into signum representation
+                    BigInteger no = new BigInteger(1, messageDigest);
+          
+                    // Convert message digest into hex value
+                    String hashtext = no.toString(16);
+          
+                    // Add preceding 0s to make it 32 bit
+                    while (hashtext.length() < 32) {
+                        hashtext = "0" + hashtext;
+                    }
+          
+                    // return the HashText
+                    out.write(username + ":" + hashtext);
+                    out.newLine();
+                    //Close the output stream
+                    out.close();
+                    return "Account with Username: " + username + " created successfully." + "\n";
+                }
+                // For specifying wrong message digest algorithms
+                catch (NoSuchAlgorithmException e) {
+                    out.close();
+                    throw new RuntimeException(e);
+                }                
             }
 
             }catch (Exception e){//Catch exception if any
@@ -164,7 +191,37 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     public String login(String username, String password) throws RemoteException{
         boolean accepted = false;
         try {
-            String hash = String.valueOf(password.hashCode());
+            String hash = "";
+            try {
+                // getInstance() method is called with algorithm SHA-512
+                MessageDigest md = MessageDigest.getInstance("SHA-512");
+      
+                // digest() method is called
+                // to calculate message digest of the input string
+                // returned as array of byte
+                byte[] messageDigest = md.digest(password.getBytes());
+      
+                // Convert byte array into signum representation
+                BigInteger no = new BigInteger(1, messageDigest);
+      
+                // Convert message digest into hex value
+                String hashtext = no.toString(16);
+      
+                // Add preceding 0s to make it 32 bit
+                while (hashtext.length() < 32) {
+                    hashtext = "0" + hashtext;
+                }
+      
+                // return the HashText
+                hash = hashtext;
+            }
+            // For specifying wrong message digest algorithms
+            catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+            if(hash.equals("")){
+                return "Login failed";
+            }
 
             // Setup read file. 
             File myObj = new File("password.txt");
