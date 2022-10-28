@@ -1,4 +1,8 @@
 package com.App;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -6,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Scanner;
+
 import com.Domain.Pair;
 import com.Domain.Printer;
 
@@ -114,7 +120,88 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
             }
         }
         return -1;
-    }        
+    }   
+    
+    
+
+    public String createUser(String username, String password) throws RemoteException{
+        try{
+            // Create file if it dosen't exist. Boolean in FileWriter makes sure we append to file and don't overwrite. 
+            File file = new File("password.txt");
+            file.createNewFile();
+            boolean name_exist = false;
+            Scanner myReader = new Scanner(file);
+
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                String name = data.substring(0, data.indexOf(':'));
+                if (username.equals(name)){
+                    name_exist = true;
+                }
+            }
+            myReader.close();
+            
+            if (!name_exist){
+                FileWriter fstream = new FileWriter(file, true);
+                BufferedWriter out = new BufferedWriter(fstream);
+                // Write to file and make a new line. 
+                int hash = password.hashCode();
+                out.write(username + ":" + hash);
+                out.newLine();
+                //Close the output stream
+                out.close();
+                return "Account with Username: " + username + " created successfully." + "\n";
+            }
+
+            }catch (Exception e){//Catch exception if any
+              System.err.println("Error: " + e.getMessage());
+            }
+            
+            return "Account with Username: " + username + " already excist." + "\n";
+    }
+
+
+    public String login(String username, String password) throws RemoteException{
+        boolean accepted = false;
+        try {
+            String hash = String.valueOf(password.hashCode());
+
+            // Setup read file. 
+            File myObj = new File("password.txt");
+            Scanner myReader = new Scanner(myObj);
+            
+            // Read through every line. 
+            while (myReader.hasNextLine()) {
+              String data = myReader.nextLine();
+              
+              String name = data.substring(0, data.indexOf(':'));
+              // Check if username is the one we are looking for
+              if(username.equals(name)){
+                String pw = data.substring(data.indexOf(':') + 1);
+                // Check that the password matches. 
+
+                if (hash.equals(pw)){
+                    accepted = true;
+                }
+                break;
+              }
+              
+            }
+            myReader.close();
+          } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
+        if(accepted){
+            return "Login successful" + "\n";
+        }else{
+            return "Login failed, try again" + "\n";
+        }
+        //return "Password: " + password + "  accepted status: " + accepted + "\n";
+    }
+
+
+
 }
     
 

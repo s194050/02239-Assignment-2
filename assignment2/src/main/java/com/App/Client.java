@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 import com.Domain.Printer;
 
 public class Client
@@ -16,15 +15,45 @@ public class Client
         String[] printers = {"Printer1", "Printer2", "Printer3", "Printer4", "Printer5"};
         Scanner scanner = new Scanner(System.in);
         ClientToPrinter client1 = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/ClientToPrinter"); 
-        Boolean run = true;
+        Boolean run = true, loggedIn = false;
         int selection;
         int job = 0;
 
         for(int i = 0; i < printers.length; i++){ // Add printers
             client1.addPrinter(printers[i]);
         }
-        
-        System.out.println("Welcome to the print server \n");
+
+
+        while(!loggedIn){ // Handle the login process
+            System.out.println("Welcome to the print server \n 1: Login \n 2: Create user \n 3: Exit");
+            selection = Integer.parseInt(scanner.next() + scanner.nextLine());
+            switch(selection){ // Handle the selection
+                case 1:
+                    System.out.println("Enter username");
+                    String username = scanner.next() + scanner.nextLine();
+                    System.out.println("Enter password");
+                    String password = scanner.next() + scanner.nextLine();
+                    System.out.println(client1.login(username, password));
+                    if(client1.login(username, password).equals("Login successful" + "\n")){ // If the login was successful, allow access to the printserver
+                        loggedIn = true;
+                    }// Otherwise break, and allow the user to try again
+                    break;
+                case 2:
+                    System.out.println("Enter username");
+                    username = scanner.next() + scanner.nextLine();
+                    System.out.println("Enter password");
+                    password = scanner.next() + scanner.nextLine();
+                    System.out.println(client1.createUser(username, password)); // Create user
+                    break;
+                case 3:
+                    // Hard exit the program
+                    run = false;
+                    loggedIn = true;
+                    System.out.println("Thanks for using the print server");
+                    break;
+            }
+        }
+
         while(run){
             System.out.print("Server Options: \n \t\t 1: Start Server \t\t\t 2: Stop Server \t\t\t 3: Restart Server \n" +
                     "Printer Functions: \n \t\t 4: Print file \n \t\t 5: Print the job queue of a specific printer \n" +
