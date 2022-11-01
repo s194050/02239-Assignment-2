@@ -11,7 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.Domain.Pair;
 import com.Domain.Printer;
-import com.Domain.Session;
 
 
 public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
