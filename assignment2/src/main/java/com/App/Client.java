@@ -10,11 +10,10 @@ import com.Domain.Printer;
 
 public class Client
 {
-    public static void main( String[] args ) throws MalformedURLException, RemoteException, NotBoundException
-    {
+    public static void main( String[] args ) throws MalformedURLException, RemoteException, NotBoundException, InterruptedException {
         String[] printers = {"Printer1", "Printer2", "Printer3", "Printer4", "Printer5"};
         Scanner scanner = new Scanner(System.in);
-        ClientToPrinter client1 = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/ClientToPrinter"); 
+        ClientToPrinter client1 = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/ClientToPrinter");
         Boolean run = true, loggedIn = false;
         int selection;
         int job = 0;
@@ -62,7 +61,7 @@ public class Client
 
 
             selection = Integer.parseInt(scanner.next() + scanner.nextLine());
-            
+
             switch (selection){ // Handle the selection
                 case 1:
                     client1.Start();
@@ -84,7 +83,7 @@ public class Client
                     }
 
                     System.out.println("Enter the name of the file you want to print: ");
-                    
+
                     String filename = scanner.next() + scanner.nextLine();
 
                     System.out.println(client1.print(filename, printer));
@@ -98,7 +97,7 @@ public class Client
                         System.out.println("Printer does not exist, try again");
                         break;
                     }
-                    
+
                     System.out.println(client1.queue(printer));
                     break;
                 case 6:
@@ -116,7 +115,7 @@ public class Client
                         System.out.println("Invalid input, try again"); // If not an integer allow user to try again
                         break;
                     }
-                    
+
                     if(client1.getJobID(job, printer) == -1){
                         System.out.println("Job does not exist, try again");
                         break;

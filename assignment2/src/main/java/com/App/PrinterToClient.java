@@ -5,32 +5,26 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.Domain.Pair;
 import com.Domain.Printer;
 
-
 public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
     private static final long serialVersionUID = 1L; // Serial version UID
     private String name; // Name of server
     private List<Printer> printers = new ArrayList<>(); // List of printers
 
-
+    private static Boolean StatusOfPrinter = Boolean.FALSE;
 
 
     public PrinterToClient(String name) throws RemoteException {
         super(); // Call to UnicastRemoteObject constructor
         this.name = name; // "Server"
     }
-    
+
     public String echo(String input) throws RemoteException { // "Client"
         return "Hello " + input + " from " + name;
     }
@@ -43,7 +37,6 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
         return null; // Printer not found
     }
-
 
     public String queue(String printer) { // Get queue for a printer
         for (Printer specficPrinter : printers) { // Loop through printers
@@ -64,41 +57,89 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
     public void Start() { //  start the print server
+        if (ServerOfflineException()) {
+            return;
+        }
         System.out.println("Starting");
-        
-    }
+//        if (this.StatusOfPrinter.equals(Boolean.FALSE)) {
+//            System.out.println("Starting");
+//            this.StatusOfPrinter = Boolean.TRUE;
+//        } else {
+//            System.out.println("It already started");
+        }
+
 
     public void Stop() { // stop the print server
+        if (ServerOfflineException()) {
+            return;
+        }
         System.out.println("Stopping");
-        
+//        if (this.StatusOfPrinter.equals(Boolean.TRUE)) {
+//            System.out.println("Stopping");
+//            this.StatusOfPrinter = Boolean.FALSE;
+//        } else {
+//            System.out.println("It already stopped");
+//        }
     }
 
-    public void Restart() { // restart the print server
+    public void Restart() throws InterruptedException { // restart the print server
+        if (ServerOfflineException()) {
+            return;
+        }
+
         System.out.println("Restarting");
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("...");
+            }
+        }, 0, 1000);
+
+        Thread.sleep(5000);
+        timer.cancel();
+
+        System.out.println("Restarted");
         
     }
 
     public String status(String printer) { // status of the printer
+        if (ServerOfflineException()) {
+            return null;
+        }
         return "Status of " + printer;
         
     }
 
     public String readConfig(String parameter) { // read the configuration file
+        if (ServerOfflineException()) {
+            return null;
+        }
         return "Reading " + parameter;
         
     }
 
     public String setConfig(String parameter, String value) { // set a configuration parameter
+        if (ServerOfflineException()) {
+            return null;
+        }
         return "Setting " + parameter + " to " + value;
         
     }
 
-
     public void addPrinter(String printerName) { // Add a printer
+        if (ServerOfflineException()) {
+            return;
+        }
         printers.add(new Printer(printerName));
     }
 
     public String getPrinter(String printerName) { // Get a printer
+        if (ServerOfflineException()) {
+            return null;
+        }
+
         for (Printer printer : printers) {
             if (printer.getPrinterName().equals(printerName)) {
                 return printer.getPrinterName();
@@ -108,27 +149,35 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
     public String getPrinters() { // Get all printers
-        String printerNames = "";
-        for (Printer printer : printers) {
-            printerNames += printer.getPrinterName() + " ";
+        if (ServerOfflineException()) {
+            return null;
         }
-        return printerNames;
+
+        StringBuilder printerNames = new StringBuilder();
+        for (Printer printer : printers) {
+            printerNames.append(printer.getPrinterName()).append(" ");
+        }
+        return printerNames.toString();
     }
 
     public int getJobID(int jobNumber, String printerName) { // Get job ID
+        if (ServerOfflineException()) {
+            return -1;
+        }
+
         for (Printer printer : printers) {
             if (printer.getPrinterName().equals(printerName)) {
                 return printer.getJobNumber(jobNumber);
             }
         }
         return -1;
-    }   
-    
-    
+    }
+
+
 
     public String createUser(String username, String password) throws RemoteException{
         try{
-            // Create file if it dosen't exist. Boolean in FileWriter makes sure we append to file and don't overwrite. 
+            // Create file if it dosen't exist. Boolean in FileWriter makes sure we append to file and don't overwrite.
             File file = new File("password.txt");
             file.createNewFile();
             boolean name_exist = false;
@@ -142,11 +191,11 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 }
             }
             myReader.close();
-            
+
             if (!name_exist){
                 FileWriter fstream = new FileWriter(file, true);
                 BufferedWriter out = new BufferedWriter(fstream);
-                // Write to file and make a new line. 
+                // Write to file and make a new line.
                 try {
                     // getInstance() method is called with algorithm SHA-512
                     MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -154,18 +203,18 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                     // to calculate message digest of the input string
                     // returned as array of byte
                     byte[] messageDigest = md.digest(password.getBytes());
-          
+
                     // Convert byte array into signum representation
                     BigInteger no = new BigInteger(1, messageDigest);
-          
+
                     // Convert message digest into hex value
                     String hashtext = no.toString(16);
-          
+
                     // Add preceding 0s to make it 32 bit
                     while (hashtext.length() < 32) {
                         hashtext = "0" + hashtext;
                     }
-          
+
                     // return the HashText
                     out.write(username + ":" + hashtext);
                     out.newLine();
@@ -177,13 +226,13 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 catch (NoSuchAlgorithmException e) {
                     out.close();
                     throw new RuntimeException(e);
-                }                
+                }
             }
 
             }catch (Exception e){//Catch exception if any
               System.err.println("Error: " + e.getMessage());
             }
-            
+
             return "Account with Username: " + username + " already excist." + "\n";
     }
 
@@ -195,23 +244,23 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
             try {
                 // getInstance() method is called with algorithm SHA-512
                 MessageDigest md = MessageDigest.getInstance("SHA-512");
-      
+
                 // digest() method is called
                 // to calculate message digest of the input string
                 // returned as array of byte
                 byte[] messageDigest = md.digest(password.getBytes());
-      
+
                 // Convert byte array into signum representation
                 BigInteger no = new BigInteger(1, messageDigest);
-      
+
                 // Convert message digest into hex value
                 String hashtext = no.toString(16);
-      
+
                 // Add preceding 0s to make it 32 bit
                 while (hashtext.length() < 32) {
                     hashtext = "0" + hashtext;
                 }
-      
+
                 // return the HashText
                 hash = hashtext;
             }
@@ -223,26 +272,26 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 return "Login failed";
             }
 
-            // Setup read file. 
+            // Setup read file.
             File myObj = new File("password.txt");
             Scanner myReader = new Scanner(myObj);
-            
-            // Read through every line. 
+
+            // Read through every line.
             while (myReader.hasNextLine()) {
               String data = myReader.nextLine();
-              
+
               String name = data.substring(0, data.indexOf(':'));
               // Check if username is the one we are looking for
               if(username.equals(name)){
                 String pw = data.substring(data.indexOf(':') + 1);
-                // Check that the password matches. 
+                // Check that the password matches.
 
                 if (hash.equals(pw)){
                     accepted = true;
                 }
                 break;
               }
-              
+
             }
             myReader.close();
           } catch (FileNotFoundException e) {
@@ -257,7 +306,12 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         //return "Password: " + password + "  accepted status: " + accepted + "\n";
     }
 
-
+    public boolean ServerOfflineException () {
+            if(PrinterToClient.StatusOfPrinter.equals(Boolean.FALSE)) {
+                System.out.println("Server is offline. Please start the server");
+                return true;
+            } else return false;
+        }
 
 }
     
