@@ -9,28 +9,21 @@ import java.util.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import com.Domain.Pair;
 import com.Domain.Parameter;
 import com.Domain.Printer;
 
 
 public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
     private static final long serialVersionUID = 1L; // Serial version UID
-    private String name; // Name of server
     private List<Printer> printers = new ArrayList<>(); // List of printers
     private List<Parameter> parameters = new ArrayList<>();
     private UUID uniqueUserIdentifier; // Unique user identifier
 
-    private static boolean statusOfServer = false;
+    //private static boolean statusOfServer = false;
 
 
     public PrinterToClient(String name) throws RemoteException {
         super(); // Call to UnicastRemoteObject constructor
-        this.name = name; // "Server"
-    }
-
-    public String echo(String input) throws RemoteException { // "Client"
-        return "Hello " + input + " from " + name;
     }
     
     public String print(String filename, String printer){ // Print a file
@@ -61,37 +54,17 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
     public String Start() { //  start the print server
-        statusOfServer = true;
+        //statusOfServer = true;
         return "Server is starting";
-//        if (this.StatusOfPrinter.equals(Boolean.FALSE)) {
-//            System.out.println("Starting");
-//            this.StatusOfPrinter = Boolean.TRUE;
-//        } else {
-//            System.out.println("It already started");
-        }
+    }
 
 
     public String Stop() { // stop the print server
-        if (ServerOfflineException()) {
-            return null;
-        }
-        statusOfServer = false;
+        //statusOfServer = false;
         return "Stopping the server";
-//        if (this.StatusOfPrinter.equals(Boolean.TRUE)) {
-//            System.out.println("Stopping");
-//            this.StatusOfPrinter = Boolean.FALSE;
-//        } else {
-//            System.out.println("It already stopped");
-//        }
     }
 
     public String Restart() throws InterruptedException { // restart the print server
-        if (ServerOfflineException()) {
-            return null;
-        }
-
-        //System.out.println("Restarting");
-
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -104,16 +77,18 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         timer.cancel();
 
         return "Server restarted";
-
     }
+
 
     public String status(String printer) { // status of the printer
-        if (ServerOfflineException()) {
-            return null;
+        for (Printer specficPrinter : printers) { // Loop through printers
+            if (specficPrinter.getPrinterName().equals(printer)) {
+                return "Current status of : " + specficPrinter + " is: " + specficPrinter.getStatus();
+            }
         }
-        return "Status of " + printer;
-        
+        return "Printer not found";
     }
+
 
     public String readConfig(String parameter) { // read the configuration file
         for(Parameter param : parameters) {
@@ -125,6 +100,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         
     }
 
+
     public String setConfig(String parameter, String value) { // set a configuration parameter
         for(Parameter param : parameters) {
             if(param.getParameterName().equals(parameter)) {
@@ -134,8 +110,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
         parameters.add(new Parameter(parameter, value));
         return "Parameter " + parameter + " added with value " + value;
-        
     }
+
 
     public String getParameters() { // get all parameters
         String allParameters = "";
@@ -145,9 +121,11 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         return allParameters;
     }
 
+
     public void addPrinter(String printerName) { // Add a printer
         printers.add(new Printer(printerName));
     }
+
 
     public String getPrinter(String printerName) { // Get a printer
         for (Printer printer : printers) {
@@ -158,6 +136,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         return null;
     }
 
+
     public String getPrinters() { // Get all printers
         StringBuilder printerNames = new StringBuilder();
         for (Printer printer : printers) {
@@ -166,19 +145,15 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         return printerNames.toString();
     }
 
-    public int getJobID(int jobNumber, String printerName) { // Get job ID
-        if (ServerOfflineException()) {
-            return -1;
-        }
 
+    public int getJobID(int jobNumber, String printerName) { // Get job ID
         for (Printer printer : printers) {
             if (printer.getPrinterName().equals(printerName)) {
                 return printer.getJobNumber(jobNumber);
             }
         }
         return -1; // Printer is empty of jobs
-    }   
-    
+    }    
     
 
     public String createUser(String username, String password) throws RemoteException{
@@ -312,16 +287,18 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
     }
 
+
     public boolean checkSession() throws RemoteException{ // Check if session is valid
         return SessionAuth.validateSession(uniqueUserIdentifier);
     }
 
-    public boolean ServerOfflineException () {
+    /*public boolean ServerOfflineException () {
             if(PrinterToClient.statusOfServer == false){
                 System.out.println("Server is offline. Please start the server");
                 return true;
             } else return false;
         }
+        */
 
 }
     
