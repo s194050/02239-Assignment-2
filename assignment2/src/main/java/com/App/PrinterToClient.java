@@ -27,101 +27,127 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
     
     public String print(String filename, String printer){ // Print a file
-        for (Printer specficPrinter : printers) { // Loop through printers
-            if (specficPrinter.getPrinterName().equals(printer)) {
-                return specficPrinter.addToqueue(filename);
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for (Printer specficPrinter : printers) { // Loop through printers
+                if (specficPrinter.getPrinterName().equals(printer)) {
+                    specficPrinter.setStatus("Busy"); // Set printer status to busy
+                    return specficPrinter.addToqueue(filename);
+                }
             }
+            return null; // Printer not found
+        }else{
+            return "Session Invalid";
         }
-        return null; // Printer not found
     }
 
     public String queue(String printer) { // Get queue for a printer
-        for (Printer specficPrinter : printers) { // Loop through printers
-            if (specficPrinter.getPrinterName().equals(printer)) {
-                return specficPrinter.queue();
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for (Printer specficPrinter : printers) { // Loop through printers
+                if (specficPrinter.getPrinterName().equals(printer)) {
+                    return specficPrinter.queue();
+                }
             }
+            return null; // Printer not found
+        }else{
+            return "Session Invalid";
         }
-        return null; // Printer not found
     }
 
     public String topQueue(String printer, int job) { //job = job number in queue to be moved to top of queue 
-        for (Printer specficPrinter : printers) { // Loop through printers
-            if (specficPrinter.getPrinterName().equals(printer)) {
-                return specficPrinter.topQueue(job);
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for (Printer specficPrinter : printers) { // Loop through printers
+                if (specficPrinter.getPrinterName().equals(printer)) {
+                    return specficPrinter.topQueue(job);
+                }
             }
+            return null; // Printer not found
+        }else{
+            return "Session Invalid";
         }
-        return null; // Printer not found
     }
 
     public String Start() { //  start the print server
-        //statusOfServer = true;
-        return "Server is starting";
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            return "Server is starting";
+        }else{
+            return "Session Invalid";
+        }
     }
 
 
     public String Stop() { // stop the print server
-//        if (ServerOfflineException()) {
-//            return null;
-//        }
-        //statusOfServer = false;
-        return "Stopping the server";
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            return "Stopping the server";
+        }else{
+            return "Session Invalid";
+        }
     }
 
     public String Restart() throws InterruptedException { // restart the print server
-//        if (ServerOfflineException()) {
-//            return null;
-//        }
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.out.println("...");
+                }
+            }, 0, 1000);
 
-        //System.out.println("Restarting");
+            Thread.sleep(5000);
+            timer.cancel();
 
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("...");
-            }
-        }, 0, 1000);
-
-        Thread.sleep(5000);
-        timer.cancel();
-
-        return "Server restarted";
+            return "Server restarted";
+        }else{
+            return "Session Invalid";
+        }
     }
 
 
     public String status(String printer) { // status of the printer
-        for (Printer printer_element : printers) {
-            if (Objects.equals(printer, printer_element.getPrinterName())) {
-                return "Status of " + printer + " : " + "\n"
-                        + printer + " is valid";
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for (Printer printer_element : printers) {
+                if (Objects.equals(printer, printer_element.getPrinterName())) {
+                    return "Status of " + printer + " : " + "\n"
+                            + printer_element.getStatus() + "\n";
 
+                }
             }
-        }
-        return "Status of " + printer + " : " + "\n"
-                + printer + " is NOT valid" + "\n"
-                + "Please try again. ";
+            return "Status of " + printer + " : " + "\n"
+                    + printer + " does not exist." + "\n"
+                    + "Please try again. ";
+        }else{
+            return "Session Invalid";
+         }
     }
 
     public String readConfig(String parameter) { // read the configuration file
-        for(Parameter param : parameters) {
-            if(param.getParameterName().equals(parameter)) {
-                return "Value of parameter: " + parameter + " is: " + param.getParameterValue();
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for(Parameter param : parameters) {
+                if(param.getParameterName().equals(parameter)) {
+                    return "Value of parameter: " + parameter + " is: " + param.getParameterValue();
+                }
             }
+            return null;
+        }else{
+            return "Session Invalid";
         }
-        return null;
         
     }
 
 
     public String setConfig(String parameter, String value) { // set a configuration parameter
-        for(Parameter param : parameters) {
-            if(param.getParameterName().equals(parameter)) {
-                param.setParameterValue(value);
-                return "Parameter " + parameter + " set to " + value;
+        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+            for(Parameter param : parameters) {
+                if(param.getParameterName().equals(parameter)) {
+                    param.setParameterValue(value);
+                    return "Parameter " + parameter + " set to " + value;
+                }
             }
+            parameters.add(new Parameter(parameter, value));
+            return "Parameter " + parameter + " added with value " + value;
+        }else{
+            return "Session Invalid";
         }
-        parameters.add(new Parameter(parameter, value));
-        return "Parameter " + parameter + " added with value " + value;
     }
 
 
@@ -300,19 +326,6 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
             return "Login failed, try again" + "\n";
         }
     }
-
-
-    public boolean checkSession() throws RemoteException{ // Check if session is valid
-        return SessionAuth.validateSession(uniqueUserIdentifier);
-    }
-
-//    public boolean ServerOfflineException () {
-//            if(PrinterToClient.statusOfServer == false){
-//                System.out.println("Server is offline. Please start the server");
-//                return true;
-//            } else return false;
-//        }
-
 }
     
 

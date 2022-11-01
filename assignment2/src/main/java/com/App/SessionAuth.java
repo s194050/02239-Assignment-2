@@ -9,7 +9,7 @@ import com.Domain.Token;
 
 public class SessionAuth {
     private static List<Token> tokens = new ArrayList<>();
-    private static int timeout  = 1; // Timeout in minutes
+    private static int timeout  = 30; // Timeout in minutes
 
     public static UUID createSession(String user) { // Create a session
         UUID uniqueUserIdentifier = UUID.randomUUID(); // Create a unique user identifier
