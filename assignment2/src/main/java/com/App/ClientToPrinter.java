@@ -20,6 +20,7 @@ public interface ClientToPrinter extends Remote{ // Client to Printer interface
     public int getJobID(int jobNumber, String printerName) throws RemoteException;
     public String createUser(String username, String password) throws RemoteException;
     public String login(String username, String password) throws RemoteException;
+    public boolean checkSession() throws RemoteException;
 }
 
 

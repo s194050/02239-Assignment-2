@@ -11,17 +11,20 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.UUID;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.Domain.Pair;
 import com.Domain.Printer;
+import com.Domain.Session;
 
 
 public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
     private static final long serialVersionUID = 1L; // Serial version UID
     private String name; // Name of server
     private List<Printer> printers = new ArrayList<>(); // List of printers
+    private UUID uniqueUserIdentifier; // Unique user identifier
 
 
 
@@ -121,7 +124,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 return printer.getJobNumber(jobNumber);
             }
         }
-        return -1;
+        return -1; // Printer is empty of jobs
     }   
     
     
@@ -239,6 +242,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
 
                 if (hash.equals(pw)){
                     accepted = true;
+                    uniqueUserIdentifier = SessionAuth.createSession(username); // Create a session for the user.
                 }
                 break;
               }
@@ -254,7 +258,10 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }else{
             return "Login failed, try again" + "\n";
         }
-        //return "Password: " + password + "  accepted status: " + accepted + "\n";
+    }
+
+    public boolean checkSession() throws RemoteException{ // Check if session is valid
+        return SessionAuth.validateSession(uniqueUserIdentifier);
     }
 
 

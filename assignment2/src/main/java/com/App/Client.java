@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import com.Domain.Printer;
+import com.Domain.Session;
 
 public class Client
 {
@@ -24,37 +25,41 @@ public class Client
         }
 
 
-        while(!loggedIn){ // Handle the login process
-            System.out.println("Welcome to the print server \n 1: Login \n 2: Create user \n 3: Exit");
-            selection = Integer.parseInt(scanner.next() + scanner.nextLine());
-            switch(selection){ // Handle the selection
-                case 1:
-                    System.out.println("Enter username");
-                    String username = scanner.next() + scanner.nextLine();
-                    System.out.println("Enter password");
-                    String password = scanner.next() + scanner.nextLine();
-                    System.out.println(client1.login(username, password));
-                    if(client1.login(username, password).equals("Login successful" + "\n")){ // If the login was successful, allow access to the printserver
-                        loggedIn = true;
-                    }// Otherwise break, and allow the user to try again
-                    break;
-                case 2:
-                    System.out.println("Enter username");
-                    username = scanner.next() + scanner.nextLine();
-                    System.out.println("Enter password");
-                    password = scanner.next() + scanner.nextLine();
-                    System.out.println(client1.createUser(username, password)); // Create user
-                    break;
-                case 3:
-                    // Hard exit the program
-                    run = false;
-                    loggedIn = true;
-                    System.out.println("Thanks for using the print server");
-                    break;
-            }
-        }
-
         while(run){ // Run the main print functions of the server
+            while(!loggedIn){// Handle the login process
+                System.out.println("Welcome to the print server \n 1: Login \n 2: Create user \n 3: Exit");
+
+                selection = Integer.parseInt(scanner.next() + scanner.nextLine());
+                switch(selection){ // Handle the selection
+                    case 1:
+                        System.out.println("Enter username");
+                        String username = scanner.next() + scanner.nextLine();
+                        System.out.println("Enter password");
+                        String password = scanner.next() + scanner.nextLine();
+                        System.out.println(client1.login(username, password));
+                        if(client1.login(username, password).equals("Login successful" + "\n")){ // If the login was successful, allow access to the printserver
+                            loggedIn = true;
+                        }// Otherwise break, and allow the user to try again
+                        break;
+                    case 2:
+                        System.out.println("Enter username");
+                        username = scanner.next() + scanner.nextLine();
+                        System.out.println("Enter password");
+                        password = scanner.next() + scanner.nextLine();
+                        System.out.println(client1.createUser(username, password)); // Create user
+                        break;
+                    case 3:
+                        // Hard exit the program
+                        run = false;
+                        loggedIn = true;
+                        System.out.println("Thanks for using the print server");
+                        break;
+                }
+            }
+            if(run == false){ // If the user has exited the program, break the loop
+                break;
+            }
+
             System.out.print("Server Options: \n \t\t 1: Start Server \t\t\t 2: Stop Server \t\t\t 3: Restart Server \n" +
                     "Printer Functions: \n \t\t 4: Print file \n \t\t 5: Print the job queue of a specific printer \n" +
                     "\t\t 6: Move a job on a specfic printer to the top of the queue \nConfig Options: \n" +
@@ -74,6 +79,7 @@ public class Client
                     client1.Restart();
                     break;
                 case 4:
+                    checkSession(client1); // Check if the session is still valid
                     getAvailablePrinters(client1, scanner); // Get available printers
                     System.out.println("Enter the name of the printer you want to print on: ");
 
@@ -90,6 +96,7 @@ public class Client
                     System.out.println(client1.print(filename, printer));
                     break;
                 case 5:
+                    checkSession(client1); // Check if the session is still valid
                     getAvailablePrinters(client1, scanner); // Get available printers
                     System.out.println("Enter the name of the printer you want to see the job queue of: ");
                     printer = scanner.next() + scanner.nextLine();
@@ -102,6 +109,7 @@ public class Client
                     System.out.println(client1.queue(printer));
                     break;
                 case 6:
+                    checkSession(client1); // Check if the session is still valid
                     getAvailablePrinters(client1, scanner); // Get available printers
                     System.out.println("Enter the name of the printer you want to change the job queue of: ");
                     printer = scanner.next() + scanner.nextLine();
@@ -129,6 +137,7 @@ public class Client
                     System.out.println("Enter the name of the config parameter you want to read: ");
                     String parameter = scanner.next() + scanner.nextLine();
                     System.out.println(client1.readConfig(parameter));
+                    loggedIn = false;
                     break;
                 case 8:
                     System.out.println("Enter the name of the config parameter you want to set: ");
@@ -171,6 +180,14 @@ public class Client
             jobs = client.queue(printerName);
         }
         System.out.println(jobs);
+    }
+
+    public static boolean checkSession(ClientToPrinter client1) throws MalformedURLException, RemoteException, NotBoundException{
+        if(!client1.checkSession()){// Validate the session
+            System.out.println("Session expired, please login again");
+            return false;
+        } 
+        return true;
     }
 
 }
