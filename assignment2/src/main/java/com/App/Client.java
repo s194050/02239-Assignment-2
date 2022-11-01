@@ -17,6 +17,8 @@ public class Client
         Boolean run = true, loggedIn = false;
         int selection;
         int job = 0;
+        boolean serverStatus = false;
+        String printer = "";
 
         for(int i = 0; i < printers.length; i++){ // Add printers
             client1.addPrinter(printers[i]);
@@ -68,31 +70,38 @@ public class Client
 
             switch (selection){ // Handle the selection
                 case 1:
-                    client1.Start();
+                    System.out.println(client1.Start());
+                    serverStatus = true;
                     break;
                 case 2:
                     client1.Stop();
                     break;
                 case 3:
+                    System.out.println("Restarting server");
                     client1.Restart();
                     break;
                 case 4:
-                    checkSession(client1); // Check if the session is still valid
-                    getAvailablePrinters(client1, scanner); // Get available printers
-                    System.out.println("Enter the name of the printer you want to print on: ");
+                    if(serverStatus){
+                        checkSession(client1); // Check if the session is still valid
+                        getAvailablePrinters(client1, scanner); // Get available printers
+                        System.out.println("Enter the name of the printer you want to print on: ");
 
-                    String printer = scanner.next() + scanner.nextLine();
-                    if (client1.getPrinter(printer) == null){ // If the printer doesn't exist, break
-                        System.out.println("Printer does not exist, try again");
+                        printer = scanner.next() + scanner.nextLine();
+                        if (client1.getPrinter(printer) == null){ // If the printer doesn't exist, break
+                            System.out.println("Printer does not exist, try again");
+                            break;
+                        }
+
+                        System.out.println("Enter the name of the file you want to print: ");
+
+                        String filename = scanner.next() + scanner.nextLine();
+
+                        System.out.println(client1.print(filename, printer));
+                    break;
+                    }else{
+                        System.out.println("Server is not running");
                         break;
                     }
-
-                    System.out.println("Enter the name of the file you want to print: ");
-
-                    String filename = scanner.next() + scanner.nextLine();
-
-                    System.out.println(client1.print(filename, printer));
-                    break;
                 case 5:
                     checkSession(client1); // Check if the session is still valid
                     getAvailablePrinters(client1, scanner); // Get available printers
