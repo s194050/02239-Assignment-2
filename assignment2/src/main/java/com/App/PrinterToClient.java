@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.Domain.Pair;
+import com.Domain.Parameter;
 import com.Domain.Printer;
 
 
@@ -17,6 +18,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     private static final long serialVersionUID = 1L; // Serial version UID
     private String name; // Name of server
     private List<Printer> printers = new ArrayList<>(); // List of printers
+    private List<Parameter> parameters = new ArrayList<>();
     private UUID uniqueUserIdentifier; // Unique user identifier
 
     private static boolean statusOfServer = false;
@@ -71,7 +73,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
 
     public String Stop() { // stop the print server
         if (ServerOfflineException()) {
-            return null;;
+            return null;
         }
         statusOfServer = false;
         return "Stopping the server";
@@ -114,19 +116,33 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
     public String readConfig(String parameter) { // read the configuration file
-        if (ServerOfflineException()) {
-            return null;
+        for(Parameter param : parameters) {
+            if(param.getParameterName().equals(parameter)) {
+                return "Value of parameter: " + parameter + " is: " + param.getParameterValue();
+            }
         }
-        return "Reading " + parameter;
+        return null;
         
     }
 
     public String setConfig(String parameter, String value) { // set a configuration parameter
-        if (ServerOfflineException()) {
-            return null;
+        for(Parameter param : parameters) {
+            if(param.getParameterName().equals(parameter)) {
+                param.setParameterValue(value);
+                return "Parameter " + parameter + " set to " + value;
+            }
         }
-        return "Setting " + parameter + " to " + value;
+        parameters.add(new Parameter(parameter, value));
+        return "Parameter " + parameter + " added with value " + value;
         
+    }
+
+    public String getParameters() { // get all parameters
+        String allParameters = "";
+        for(Parameter param : parameters) {
+            allParameters += param.getParameterName() + " ";
+        }
+        return allParameters;
     }
 
     public void addPrinter(String printerName) { // Add a printer

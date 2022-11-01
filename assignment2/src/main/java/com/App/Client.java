@@ -97,7 +97,7 @@ public class Client
                         String filename = scanner.next() + scanner.nextLine();
 
                         System.out.println(client1.print(filename, printer));
-                    break;
+                        break;
                     }else{
                         System.out.println("Server is not running");
                         break;
@@ -141,16 +141,20 @@ public class Client
                     System.out.println(client1.topQueue(printer, job));
                     break;
                 case 7:
+                    getAvailableParameters(client1, scanner);
                     System.out.println("Enter the name of the config parameter you want to read: ");
                     String parameter = scanner.next() + scanner.nextLine();
                     System.out.println(client1.readConfig(parameter));
-                    loggedIn = false;
                     break;
                 case 8:
-                    System.out.println("Enter the name of the config parameter you want to set: ");
+                    getAvailableParameters(client1, scanner);
+                    System.out.println("Enter the name of the config parameter you want to set: \n " + 
+                    "If you want to add a new parameter, enter the name of the parameter you want to add");
                     parameter = scanner.next() + scanner.nextLine();
                     System.out.println("Enter the value you want to set the config parameter to: ");
+
                     String value = scanner.next() + scanner.nextLine();
+
                     System.out.println(client1.setConfig(parameter, value));
                     break;
                 case 9:
@@ -187,6 +191,18 @@ public class Client
             jobs = client.queue(printerName);
         }
         System.out.println(jobs);
+    }
+
+    public static void getAvailableParameters(ClientToPrinter client, Scanner scanner) throws MalformedURLException, RemoteException, NotBoundException{
+        // Function to output all available parameters
+        String available;
+        String parameters = "";
+        System.out.println("Do you want a list of available parameters? [y/n]");
+        available = scanner.nextLine();
+        if(available.equals("y")){
+            parameters = client.getParameters();
+        }
+        System.out.println(parameters);
     }
 
     public static boolean checkSession(ClientToPrinter client1) throws MalformedURLException, RemoteException, NotBoundException{

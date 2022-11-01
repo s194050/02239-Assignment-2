@@ -3,9 +3,9 @@ package com.Domain;
 public class Parameter {
     
     private String name;
-    private int value;
+    private String value;
 
-    public Parameter(String name, int value) {
+    public Parameter(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -14,7 +14,7 @@ public class Parameter {
         return name;
     }
 
-    public int getParameterValue() {
+    public String getParameterValue() {
         return value;
     }
 
@@ -22,7 +22,7 @@ public class Parameter {
         this.name = name;
     }
 
-    public void setParameterValue(int value) {
+    public void setParameterValue(String value) {
         this.value = value;
     }
 }
