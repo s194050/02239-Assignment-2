@@ -5,11 +5,9 @@ import java.util.UUID;
 
 
 public class Token {
-
     private String user;
     private UUID uniqueUserIdentifier;
     private LocalDateTime expiryDate;
-
 
 
     public Token(UUID uniqueUserIdentifier, String user) {
@@ -18,14 +16,15 @@ public class Token {
         this.expiryDate = LocalDateTime.now();
     }
 
-
     public String getUser() {
         return user;
     }
 
+
     public void setUser(String user) {
         this.user = user;
     }
+
 
     public UUID getUniqueUserIdentifier() {
         return uniqueUserIdentifier;

@@ -4,22 +4,22 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import com.Domain.Printer;
+public class Client
+{
+    public static void main( String[] args ) throws MalformedURLException, RemoteException, NotBoundException, InterruptedException {
+        String[] printers = {"Printer1", "Printer2", "Printer3", "Printer4", "Printer5"}; // List of printers
+        ClientToPrinter client1 = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/ClientToPrinter"); // Connect to server
+        boolean run = true; // Used to keep the GUI running
+        boolean loggedIn = false; // Keeps track of whether the user is logged in or not
+        boolean serverStatus = false; // Simple flag to hanldes server status
 
-public class Client {
-    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, InterruptedException {
-        String[] printers = {"Printer1", "Printer2", "Printer3", "Printer4", "Printer5"};
         Scanner scanner = new Scanner(System.in);
-        ClientToPrinter client1 = (ClientToPrinter) Naming.lookup("rmi://localhost:1099/ClientToPrinter");
-        Boolean run = true, loggedIn = false;
         int selection;
         int job = 0;
-        boolean serverStatus = false;
         String printer = "";
+        String parameter = "";
 
         for (int i = 0; i < printers.length; i++) { // Add printers
             client1.addPrinter(printers[i]);
@@ -30,14 +30,14 @@ public class Client {
             while (!loggedIn) {// Handle the login process
                 System.out.println("Welcome to the print server \n 1: Login \n 2: Create user \n 3: Exit");
 
-                selection = Integer.parseInt(scanner.next() + scanner.nextLine());
-                switch (selection) { // Handle the selection
+                selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
+
+                switch(selection){ // Handle the selection
                     case 1:
                         System.out.println("Enter username");
                         String username = scanner.next() + scanner.nextLine();
                         System.out.println("Enter password");
                         String password = scanner.next() + scanner.nextLine();
-//                        System.out.println(client1.login(username, password));
                         String outputOfLogin = client1.login(username, password);
                         if (outputOfLogin.equals("Login successful" + "\n")) { // If the login was successful, allow access to the printserver
                             System.out.println(outputOfLogin);
@@ -69,7 +69,7 @@ public class Client {
                     "\t\t 7: Read a config parameter \n \t\t 8: Set a config parameter \n9: Exit Server GUI \n");
 
 
-            selection = Integer.parseInt(scanner.next() + scanner.nextLine());
+            selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
 
             switch (selection) { // Handle the selection
                 case 0:
@@ -132,6 +132,7 @@ public class Client {
                         System.out.println("Server is not running");
                         break;
                     }
+
                 case 5:
                     if (serverStatus) {
                         checkSession(client1); // Check if the session is still valid
@@ -186,7 +187,7 @@ public class Client {
                     if (serverStatus) {
                         getAvailableParameters(client1, scanner);
                         System.out.println("Enter the name of the config parameter you want to read: ");
-                        String parameter = scanner.next() + scanner.nextLine();
+                        parameter = scanner.next() + scanner.nextLine();
                         System.out.println(client1.readConfig(parameter));
                         break;
                     } else {
@@ -198,7 +199,7 @@ public class Client {
                         getAvailableParameters(client1, scanner);
                         System.out.println("Enter the name of the config parameter you want to set: \n " +
                                 "If you want to add a new parameter, enter the name of the parameter you want to add");
-                        String parameter = scanner.next() + scanner.nextLine();
+                        parameter = scanner.next() + scanner.nextLine();
                         System.out.println("Enter the value you want to set the config parameter to: ");
 
                         String value = scanner.next() + scanner.nextLine();

@@ -9,7 +9,7 @@ import com.Domain.Token;
 
 public class SessionAuth {
     private static List<Token> tokens = new ArrayList<>();
-    private static int timeout  = 30; // Timeout in minutes
+    private static int timeout  = 1; // Timeout in minutes
 
     public static UUID createSession(String user) { // Create a session
         UUID uniqueUserIdentifier = UUID.randomUUID(); // Create a unique user identifier
@@ -17,6 +17,7 @@ public class SessionAuth {
         System.out.println(user + " logged in" + " with token " + uniqueUserIdentifier);
         return uniqueUserIdentifier;
     }
+    
 
     public static boolean validateSession(UUID uniqueUserIdentifier) { // Validate session
         System.out.println("Validating session " + uniqueUserIdentifier + " Amount of tokens" + tokens.size());
@@ -27,6 +28,7 @@ public class SessionAuth {
         }
         return false; // Token not found
     }
+
 
     public static boolean timeoutHandler(Token token){ // Check if token has timed out
         if(token.getExpiryDate().isAfter(LocalDateTime.now().minusMinutes(timeout))){ 
