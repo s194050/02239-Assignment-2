@@ -31,7 +31,7 @@ public class Client
 
         while (run) { // Run the main print functions of the server
             while (!loggedIn) {// Handle the login process
-                System.out.println("Welcome to the print server \n 1: Login \n 2: Create user \n 3: Exit");
+                System.out.println("Welcome to the print server \n 1: Login \n 2: Exit");
 
                 selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
 
@@ -48,13 +48,6 @@ public class Client
                         }// Otherwise break, and allow the user to try again
                         break;
                     case 2:
-                        System.out.println("Enter username");
-                        username = scanner.next() + scanner.nextLine();
-                        System.out.println("Enter password");
-                        password = scanner.next() + scanner.nextLine();
-                        System.out.println(client1.createUser(username, password)); // Create user
-                        break;
-                    case 3:
                         // Hard exit the program
                         run = false;
                         loggedIn = true;
@@ -65,13 +58,17 @@ public class Client
             if (run == false) { // If the user has exited the program, break the loop
                 break;
             }
-
+            
             System.out.print("Server Options: \n \t\t 1: Start Server \t\t\t 2: Stop Server \t\t\t 3: Restart Server \n" +
                     "Printer Functions: \n \t\t 4: Print file \n \t\t 5: Print the job queue of a specific printer \n" +
                     "\t\t 6: Move a job on a specfic printer to the top of the queue\n" +
                     "\t\t 7: Get status of a printer\n \nConfig Options: \n \t\t 8: Read a config parameter\n" +
                     "\t\t 9: Set a config parameter \n10: Exit Server GUI \n");
 
+
+            if (username.equals("root")) { // If the user is root, allow them to create users
+                System.out.println("If you want to create a user, enter 11");
+            }
 
             selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
 
@@ -263,6 +260,13 @@ public class Client
                         System.out.println("Server is not running");
                         break;
                     }
+                case 11:
+                    System.out.println("Enter username");
+                    username = scanner.next() + scanner.nextLine();
+                    System.out.println("Enter password");
+                    password = scanner.next() + scanner.nextLine();
+                    System.out.println(client1.createUser(username, password)); // Create user
+                    break;
                 default:
                     System.out.println("Invalid selection");
                     break;
