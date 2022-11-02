@@ -284,11 +284,11 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
     }
 
-    public UUID getUniqueUserIdentifier() {
+    public UUID getUniqueUserIdentifier() { // Assign the user a token indicating that they are logged in
         return uniqueUserIdentifier;
     }
 
-    public String logout(UUID userToken) {
+    public String logout(UUID userToken) { // Remove the users token from the list of valid tokens
         if(SessionAuth.removeSession(userToken)){
             return "Logout successful" + "\n";
         }else{

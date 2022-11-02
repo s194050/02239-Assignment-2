@@ -45,7 +45,7 @@ public class Client
                             if (outputOfLogin.equals("Login successful" + "\n")) { // If the login was successful, allow access to the printserver
                                 System.out.println(outputOfLogin);
                                 loggedIn = true;
-                                uniqueUserToken = client1.getUniqueUserIdentifier();
+                                uniqueUserToken = client1.getUniqueUserIdentifier(); // Assign token to the user
                             } // Otherwise break, and allow the user to try again
                             else {
                                 System.out.println(outputOfLogin);

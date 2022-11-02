@@ -18,7 +18,7 @@ public class SessionAuth {
         return uniqueUserIdentifier;
     }
 
-    public static boolean validateUser(String username){
+    public static boolean validateUser(String username){ // Validates whether the user is already logged in
         for (Token token : tokens) {
             if (token.getUser().equals(username)) { // Check if user is logged in
                 return true;
@@ -27,7 +27,7 @@ public class SessionAuth {
         return false;
     }
 
-    public static boolean removeSession(UUID uniqueUserIdentifier){
+    public static boolean removeSession(UUID uniqueUserIdentifier){ // Removes the token from the list of tokens, indicating that the user has logged out and the session is terminated
         for (Token token : tokens) {
             if (token.getUniqueUserIdentifier().equals(uniqueUserIdentifier)) { // Check if user is logged in
                 tokens.remove(token);
