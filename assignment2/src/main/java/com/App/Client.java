@@ -28,7 +28,6 @@ public class Client
             client1.addPrinter(printers[i]);
         }
 
-
         while (run) { // Run the main print functions of the server
             while (!loggedIn) {// Handle the login process
                 System.out.println("Welcome to the print server \n 1: Login \n 2: Exit");
