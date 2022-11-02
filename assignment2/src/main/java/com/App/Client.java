@@ -63,7 +63,7 @@ public class Client
             System.out.print("Server Options: \n \t\t 1: Start Server \t\t\t 2: Stop Server \t\t\t 3: Restart Server \n" +
                     "Printer Functions: \n \t\t 4: Print file \n \t\t 5: Print the job queue of a specific printer \n" +
                     "\t\t 6: Move a job on a specfic printer to the top of the queue\n" +
-                    "\t\t 7: Get status of a printer\n \nConfig Options: \n \t\t 8: Read a config parameter\n" +
+                    "\t\t 7: Get status of a printer\n Config Options: \n \t\t 8: Read a config parameter\n" +
                     "\t\t 9: Set a config parameter \n10: Exit Server GUI \n");
 
             if (username.equals("root")) { // If the user is root, allow them to create users
@@ -79,7 +79,7 @@ public class Client
                         serverStatus = true;
                         break;
                     } else {
-                        System.out.println("Server has already started!");
+                        System.out.println("Server has already started!\n");
                         break;
                     }
                 case 2:
@@ -88,27 +88,26 @@ public class Client
                         serverStatus = false;
                         break;
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 3:
                     if (serverStatus) {
-                        System.out.println("Restarting server");
+                        System.out.println("Restarting server\n");
                         System.out.println(client1.Restart()); // Restart the server
                         break;
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 4:
                     if (serverStatus) {
-                        //checkSession(client1); // Check if the session is still valid
                         getAvailablePrinters(client1, scanner); // Get available printers
                         System.out.println("Enter the name of the printer you want to print on: ");
 
                         printer = scanner.next() + scanner.nextLine();
                         if (client1.getPrinter(printer) == null) { // If the printer doesn't exist, break
-                            System.out.println("Printer does not exist, try again");
+                            System.out.println("Printer does not exist, try again\n");
                             break;
                         }
 
@@ -118,7 +117,7 @@ public class Client
 
                         output = client1.print(filename, printer); // Print the file
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -127,7 +126,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
 
@@ -138,13 +137,13 @@ public class Client
                         printer = scanner.next() + scanner.nextLine();
 
                         if (client1.getPrinter(printer) == null) { // Check if the printer exists
-                            System.out.println("Printer does not exist, try again");
+                            System.out.println("Printer does not exist, try again\n");
                             break;
                         }
 
                         output = client1.queue(printer); // Get the job queue
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -152,7 +151,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 6:
@@ -161,7 +160,7 @@ public class Client
                         System.out.println("Enter the name of the printer you want to change the job queue of: ");
                         printer = scanner.next() + scanner.nextLine();
                         if (client1.getPrinter(printer) == null) { // Check if the printer exists
-                            System.out.println("Printer does not exist, try again");
+                            System.out.println("Printer does not exist, try again\n");
                             break;
                         }
 
@@ -170,18 +169,18 @@ public class Client
                         try {
                             job = Integer.parseInt(scanner.next() + scanner.nextLine());
                         } catch (NumberFormatException e) {
-                            System.out.println("Invalid input, try again"); // If not an integer allow user to try again
+                            System.out.println("Invalid input, try again\n"); // If not an integer allow user to try again
                             break;
                         }
 
                         if (client1.getJobID(job, printer) == -1) {
-                            System.out.println("Job does not exist, try again");
+                            System.out.println("Job does not exist, try again\n");
                             break;
                         }
 
                         output = client1.topQueue(printer, job); // Move the job to the top of the queue
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -189,7 +188,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 7:
@@ -199,7 +198,7 @@ public class Client
                         printer = scanner.next() + scanner.nextLine();
                         output = client1.status(printer); // Get the status of the printer
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -207,7 +206,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 8:
@@ -218,7 +217,7 @@ public class Client
 
                         output = client1.readConfig(parameter); // Read the config parameter
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -226,7 +225,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 9:
@@ -240,7 +239,7 @@ public class Client
                         String value = scanner.next() + scanner.nextLine();
                         output = client1.setConfig(parameter, value); // Set the config parameter
                         if(output.equals("Session Invalid")){ // If the session is invalid, break
-                            System.out.println("Session expired, please login again");
+                            System.out.println("Session expired, please login again\n");
                             loggedIn = false;
                             break;
                         }else{
@@ -248,7 +247,7 @@ public class Client
                             break;
                         }
                     } else {
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }
                 case 10:
@@ -270,11 +269,11 @@ public class Client
                         System.out.println(client1.createUser(temp_username, temp_password)); // Create user
                         break;
                     }else{
-                        System.out.println("Server is not running");
+                        System.out.println("Server is not running\n");
                         break;
                     }  
                 default:
-                    System.out.println("Invalid selection");
+                    System.out.println("Invalid selection\n");
                     break;
             }
         }
