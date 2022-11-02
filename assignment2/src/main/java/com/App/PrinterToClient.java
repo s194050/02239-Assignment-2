@@ -237,7 +237,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
               System.err.println("Error: " + e.getMessage());
             }
 
-            return "Account with Username: " + username + " already excist." + "\n";
+            return "Account with Username: " + username + " already exists." + "\n";
     }
 
 

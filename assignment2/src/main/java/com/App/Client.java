@@ -68,7 +68,7 @@ public class Client
                     "\t\t 9: Set a config parameter \n10: Exit Server GUI \n");
 
             if (username.equals("root")) { // If the user is root, allow them to create users
-                System.out.println("If you want to create a user, enter 11");
+                System.out.println("11: Create a user");
             }
 
             selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
@@ -76,7 +76,7 @@ public class Client
             switch (selection) { // Handle the selection
                 case 1:
                     if (!serverStatus) {
-                        System.out.println(client1.Start());
+                        System.out.println(client1.Start()); // Start the server
                         serverStatus = true;
                         break;
                     } else {
@@ -85,7 +85,7 @@ public class Client
                     }
                 case 2:
                     if (serverStatus) {
-                        client1.Stop();
+                        client1.Stop(); // Stop the server
                         serverStatus = false;
                         break;
                     } else {
@@ -95,7 +95,7 @@ public class Client
                 case 3:
                     if (serverStatus) {
                         System.out.println("Restarting server");
-                        client1.Restart();
+                        System.out.println(client1.Restart()); // Restart the server
                         break;
                     } else {
                         System.out.println("Server is not running");
@@ -253,28 +253,27 @@ public class Client
                         break;
                     }
                 case 10:
-                    if (serverStatus) {
                         run = false;
                         System.out.println("Thanks for using the print server");
                         System.out.println("Exiting...");
                         System.exit(0);
-                    } else {
-                        System.out.println("Server is not running");
-                        System.out.println("Exiting...");
-                        System.exit(0);
-                    }
                 case 11:
-                    if (!username.equals("root")) {
-                        // this error message can give information to a hacker
-                        // System.out.println("You do not have permission to use this command");
+                    if(serverStatus){
+                        if (!username.equals("root")) {
+                            // this error message can give information to a hacker
+                            // System.out.println("You do not have permission to use this command");
+                            break;
+                        }
+                        System.out.println("Enter username");
+                        String temp_username = scanner.next() + scanner.nextLine();
+                        System.out.println("Enter password");
+                        String temp_password = scanner.next() + scanner.nextLine();
+                        System.out.println(client1.createUser(temp_username, temp_password)); // Create user
                         break;
-                    }
-                    System.out.println("Enter username");
-                    String temp_username = scanner.next() + scanner.nextLine();
-                    System.out.println("Enter password");
-                    String temp_password = scanner.next() + scanner.nextLine();
-                    System.out.println(client1.createUser(temp_username, temp_password)); // Create user
-                    break;
+                    }else{
+                        System.out.println("Server is not running");
+                        break;
+                    }  
                 default:
                     System.out.println("Invalid selection");
                     break;
