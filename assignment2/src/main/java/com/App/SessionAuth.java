@@ -20,7 +20,7 @@ public class SessionAuth {
     
 
     public static boolean validateSession(UUID uniqueUserIdentifier) { // Validate session
-        System.out.println("Validating session " + uniqueUserIdentifier + " Amount of tokens" + tokens.size());
+        System.out.println("Validating session, with token: " + uniqueUserIdentifier + " Amount of tokens: " + tokens.size());
         for (Token token : tokens) { // Loop through tokens
             if (token.getUniqueUserIdentifier().equals(uniqueUserIdentifier)) {
                 return timeoutHandler(token); // Check if token has timed out
