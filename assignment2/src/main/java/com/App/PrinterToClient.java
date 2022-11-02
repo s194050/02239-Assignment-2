@@ -9,6 +9,8 @@ import java.util.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import com.Domain.Parameter;
 import com.Domain.Printer;
 
@@ -216,25 +218,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
                 BufferedWriter out = new BufferedWriter(fstream);
                 // Write to file and make a new line.
                 try {
-                    // getInstance() method is called with algorithm SHA-512
-                    MessageDigest md = MessageDigest.getInstance("SHA-512");
-                    // digest() method is called
-                    // to calculate message digest of the input string
-                    // returned as array of byte
-                    byte[] messageDigest = md.digest(password.getBytes());
-
-                    // Convert byte array into signum representation
-                    BigInteger no = new BigInteger(1, messageDigest);
-
-                    // Convert message digest into hex value
-                    String hashtext = no.toString(16);
-
-                    // Add preceding 0s to make it 32 bit
-                    while (hashtext.length() < 32) {
-                        hashtext = "0" + hashtext;
-                    }
-
-                    // return the HashText
+                    String hashtext = StrongSecuredPassword.generateStorngPasswordHash(password);
+                    // save the username and the hash
                     out.write(username + ":" + hashtext);
                     out.newLine();
                     //Close the output stream
@@ -259,38 +244,6 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     public String login(String username, String password) throws RemoteException{
         boolean accepted = false;
         try {
-            String hash = "";
-            try {
-                // getInstance() method is called with algorithm SHA-512
-                MessageDigest md = MessageDigest.getInstance("SHA-512");
-
-                // digest() method is called
-                // to calculate message digest of the input string
-                // returned as array of byte
-                byte[] messageDigest = md.digest(password.getBytes());
-
-                // Convert byte array into signum representation
-                BigInteger no = new BigInteger(1, messageDigest);
-
-                // Convert message digest into hex value
-                String hashtext = no.toString(16);
-
-                // Add preceding 0s to make it 32 bit
-                while (hashtext.length() < 32) {
-                    hashtext = "0" + hashtext;
-                }
-
-                // return the HashText
-                hash = hashtext;
-            }
-            // For specifying wrong message digest algorithms
-            catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            if(hash.equals("")){
-                return "Login failed";
-            }
-
             // Setup read file.
             File myObj = new File("password.txt");
             Scanner myReader = new Scanner(myObj);
@@ -304,16 +257,15 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
               if(username.equals(name)){
                 String pw = data.substring(data.indexOf(':') + 1);
                 // Check that the password matches.
-
-                if (hash.equals(pw)){
-                    accepted = true;
-//                    uniqueUserIdentifier = SessionAuth.createSession(username); // Create a session for the user.
+                try {
+                    accepted = StrongSecuredPassword.validatePassword(password, pw);
+                } 
+                catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    accepted = false;
                 }
                 break;
               }
-
             }
-
             myReader.close();
           } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");

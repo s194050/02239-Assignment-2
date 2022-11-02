@@ -45,14 +45,16 @@ public class Client
                         if (outputOfLogin.equals("Login successful" + "\n")) { // If the login was successful, allow access to the printserver
                             System.out.println(outputOfLogin);
                             loggedIn = true;
-                        }// Otherwise break, and allow the user to try again
+                        } // Otherwise break, and allow the user to try again
+                        else {
+                            System.out.println(outputOfLogin);
+                        }
                         break;
                     case 2:
                         // Hard exit the program
                         run = false;
-                        loggedIn = true;
                         System.out.println("Thanks for using the print server");
-                        break;
+                        System.exit(0);
                 }
             }
             if (run == false) { // If the user has exited the program, break the loop
@@ -64,7 +66,6 @@ public class Client
                     "\t\t 6: Move a job on a specfic printer to the top of the queue\n" +
                     "\t\t 7: Get status of a printer\n \nConfig Options: \n \t\t 8: Read a config parameter\n" +
                     "\t\t 9: Set a config parameter \n10: Exit Server GUI \n");
-
 
             if (username.equals("root")) { // If the user is root, allow them to create users
                 System.out.println("If you want to create a user, enter 11");
@@ -255,17 +256,24 @@ public class Client
                     if (serverStatus) {
                         run = false;
                         System.out.println("Thanks for using the print server");
-                        break;
+                        System.out.println("Exiting...");
+                        System.exit(0);
                     } else {
                         System.out.println("Server is not running");
-                        break;
+                        System.out.println("Exiting...");
+                        System.exit(0);
                     }
                 case 11:
+                    if (!username.equals("root")) {
+                        // this error message can give information to a hacker
+                        // System.out.println("You do not have permission to use this command");
+                        break;
+                    }
                     System.out.println("Enter username");
-                    username = scanner.next() + scanner.nextLine();
+                    String temp_username = scanner.next() + scanner.nextLine();
                     System.out.println("Enter password");
-                    password = scanner.next() + scanner.nextLine();
-                    System.out.println(client1.createUser(username, password)); // Create user
+                    String temp_password = scanner.next() + scanner.nextLine();
+                    System.out.println(client1.createUser(temp_username, temp_password)); // Create user
                     break;
                 default:
                     System.out.println("Invalid selection");
