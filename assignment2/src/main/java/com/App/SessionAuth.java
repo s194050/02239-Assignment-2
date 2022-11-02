@@ -17,6 +17,25 @@ public class SessionAuth {
         System.out.println(user + " logged in" + " with token " + uniqueUserIdentifier);
         return uniqueUserIdentifier;
     }
+
+    public static boolean validateUser(String username){
+        for (Token token : tokens) {
+            if (token.getUser().equals(username)) { // Check if user is logged in
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean removeSession(UUID uniqueUserIdentifier){
+        for (Token token : tokens) {
+            if (token.getUniqueUserIdentifier().equals(uniqueUserIdentifier)) { // Check if user is logged in
+                tokens.remove(token);
+                return true;
+            }
+        }
+        return false;
+    }
     
 
     public static boolean validateSession(UUID uniqueUserIdentifier) { // Validate session

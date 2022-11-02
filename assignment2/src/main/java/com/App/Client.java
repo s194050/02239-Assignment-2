@@ -5,6 +5,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Client
 {
@@ -14,7 +15,7 @@ public class Client
         boolean run = true; // Used to keep the GUI running
         boolean loggedIn = false; // Keeps track of whether the user is logged in or not
         boolean serverStatus = false; // Simple flag to hanldes server status
-
+        UUID uniqueUserToken = null; // Used to store the UUID of the user
         Scanner scanner = new Scanner(System.in);
         int selection;
         int job = 0;
@@ -44,6 +45,7 @@ public class Client
                             if (outputOfLogin.equals("Login successful" + "\n")) { // If the login was successful, allow access to the printserver
                                 System.out.println(outputOfLogin);
                                 loggedIn = true;
+                                uniqueUserToken = client1.getUniqueUserIdentifier();
                             } // Otherwise break, and allow the user to try again
                             else {
                                 System.out.println(outputOfLogin);
@@ -75,7 +77,7 @@ public class Client
                 switch (selection) { // Handle the selection
                     case 1:
                         if (!serverStatus) {
-                            System.out.println(client1.Start()); // Start the server
+                            System.out.println(client1.Start(uniqueUserToken)); // Start the server
                             serverStatus = true;
                             break;
                         } else {
@@ -84,7 +86,7 @@ public class Client
                         }
                     case 2:
                         if (serverStatus) {
-                            client1.Stop(); // Stop the server
+                            client1.Stop(uniqueUserToken); // Stop the server
                             serverStatus = false;
                             break;
                         } else {
@@ -94,7 +96,7 @@ public class Client
                     case 3:
                         if (serverStatus) {
                             System.out.println("Restarting server\n");
-                            System.out.println(client1.Restart()); // Restart the server
+                            System.out.println(client1.Restart(uniqueUserToken)); // Restart the server
                             break;
                         } else {
                             System.out.println("Server is not running\n");
@@ -115,7 +117,7 @@ public class Client
 
                             String filename = scanner.next() + scanner.nextLine();
 
-                            output = client1.print(filename, printer); // Print the file
+                            output = client1.print(filename, printer, uniqueUserToken); // Print the file
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -141,7 +143,7 @@ public class Client
                                 break;
                             }
 
-                            output = client1.queue(printer); // Get the job queue
+                            output = client1.queue(printer, uniqueUserToken); // Get the job queue
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -164,7 +166,7 @@ public class Client
                                 break;
                             }
 
-                            getAvailableJobs(client1, scanner, printer); // Get available jobs
+                            getAvailableJobs(client1, scanner, printer,uniqueUserToken); // Get available jobs
                             System.out.println("Enter the job number you want to move to the top of the queue: ");
                             try {
                                 job = Integer.parseInt(scanner.next() + scanner.nextLine());
@@ -178,7 +180,7 @@ public class Client
                                 break;
                             }
 
-                            output = client1.topQueue(printer, job); // Move the job to the top of the queue
+                            output = client1.topQueue(printer, job, uniqueUserToken); // Move the job to the top of the queue
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -196,7 +198,7 @@ public class Client
                             getAvailablePrinters(client1, scanner);
                             System.out.println("Enter the name of the printer you want to check status of: ");
                             printer = scanner.next() + scanner.nextLine();
-                            output = client1.status(printer); // Get the status of the printer
+                            output = client1.status(printer, uniqueUserToken); // Get the status of the printer
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -215,7 +217,7 @@ public class Client
                             System.out.println("Enter the name of the config parameter you want to read: ");
                             parameter = scanner.next() + scanner.nextLine();
 
-                            output = client1.readConfig(parameter); // Read the config parameter
+                            output = client1.readConfig(parameter, uniqueUserToken); // Read the config parameter
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -237,7 +239,7 @@ public class Client
                             System.out.println("Enter the value you want to set the config parameter to: ");
 
                             String value = scanner.next() + scanner.nextLine();
-                            output = client1.setConfig(parameter, value); // Set the config parameter
+                            output = client1.setConfig(parameter, value, uniqueUserToken); // Set the config parameter
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
                                 System.out.println("Session expired, please login again\n");
                                 loggedIn = false;
@@ -252,6 +254,7 @@ public class Client
                         }
                     case 10:
                             run = false;
+                            System.out.println(client1.logout(uniqueUserToken)); // Logout
                             System.out.println("Thanks for using the print server");
                             System.out.println("Exiting...");
                             System.exit(0);
@@ -266,7 +269,7 @@ public class Client
                             String temp_username = scanner.next() + scanner.nextLine();
                             System.out.println("Enter password");
                             String temp_password = scanner.next() + scanner.nextLine();
-                            System.out.println(client1.createUser(temp_username, temp_password)); // Create user
+                            System.out.println(client1.createUser(temp_username, temp_password, uniqueUserToken)); // Create user
                             break;
                         }else{
                             System.out.println("Server is not running\n");
@@ -295,14 +298,14 @@ public class Client
         System.out.println(printers);
     }
 
-    public static void getAvailableJobs(ClientToPrinter client, Scanner scanner, String printerName) throws MalformedURLException, RemoteException, NotBoundException {
+    public static void getAvailableJobs(ClientToPrinter client, Scanner scanner, String printerName, UUID uniqueUserToken) throws MalformedURLException, RemoteException, NotBoundException {
         // Function to output all available jobs
         String available;
         String jobs = "";
         System.out.println("Do you want a list of available jobs? [y/n]");
         available = scanner.nextLine();
         if (available.equals("y")) {
-            jobs = client.queue(printerName);
+            jobs = client.queue(printerName, uniqueUserToken);
         }
         System.out.println(jobs);
     }

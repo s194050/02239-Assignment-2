@@ -25,8 +25,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         super(); // Call to UnicastRemoteObject constructor
     }
     
-    public String print(String filename, String printer){ // Print a file
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String print(String filename, String printer, UUID userToken){ // Print a file
+        if(SessionAuth.validateSession(userToken)){
             for (Printer specficPrinter : printers) { // Loop through printers
                 if (specficPrinter.getPrinterName().equals(printer)) {
                     specficPrinter.setStatus("Busy"); // Set printer status to busy
@@ -39,8 +39,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
     }
 
-    public String queue(String printer) { // Get queue for a printer
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String queue(String printer, UUID userToken) { // Get queue for a printer
+        if(SessionAuth.validateSession(userToken)){
             for (Printer specficPrinter : printers) { // Loop through printers
                 if (specficPrinter.getPrinterName().equals(printer)) {
                     return specficPrinter.queue();
@@ -52,8 +52,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
     }
 
-    public String topQueue(String printer, int job) { //job = job number in queue to be moved to top of queue 
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String topQueue(String printer, int job, UUID userToken) { //job = job number in queue to be moved to top of queue 
+        if(SessionAuth.validateSession(userToken)){
             for (Printer specficPrinter : printers) { // Loop through printers
                 if (specficPrinter.getPrinterName().equals(printer)) {
                     return specficPrinter.topQueue(job);
@@ -65,8 +65,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }
     }
 
-    public String Start() { //  start the print server
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String Start(UUID userToken) { //  start the print server
+        if(SessionAuth.validateSession(userToken)){
             return "Server is starting";
         }else{
             return "Session Invalid";
@@ -74,16 +74,16 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
 
-    public String Stop() { // stop the print server
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String Stop(UUID userToken) { // stop the print server
+        if(SessionAuth.validateSession(userToken)){
             return "Stopping the server";
         }else{
             return "Session Invalid";
         }
     }
 
-    public String Restart() throws InterruptedException { // restart the print server
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String Restart(UUID userToken) throws InterruptedException { // restart the print server
+        if(SessionAuth.validateSession(userToken)){
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -102,8 +102,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
 
-    public String status(String printer) { // status of the printer
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String status(String printer, UUID userToken) { // status of the printer
+        if(SessionAuth.validateSession(userToken)){
             for (Printer printer_element : printers) {
                 if (Objects.equals(printer, printer_element.getPrinterName())) {
                     return "Status of " + printer + " : " + "\n"
@@ -119,8 +119,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
          }
     }
 
-    public String readConfig(String parameter) { // read the configuration file
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String readConfig(String parameter, UUID userToken) { // read the configuration file
+        if(SessionAuth.validateSession(userToken)){
             for(Parameter param : parameters) {
                 if(param.getParameterName().equals(parameter)) {
                     return "Value of parameter: " + parameter + " is: " + param.getParameterValue();
@@ -134,8 +134,8 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
 
-    public String setConfig(String parameter, String value) { // set a configuration parameter
-        if(SessionAuth.validateSession(uniqueUserIdentifier)){
+    public String setConfig(String parameter, String value, UUID userToken) { // set a configuration parameter
+        if(SessionAuth.validateSession(userToken)){
             for(Parameter param : parameters) {
                 if(param.getParameterName().equals(parameter)) {
                     param.setParameterValue(value);
@@ -193,7 +193,9 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     }
 
 
-    public String createUser(String username, String password) throws RemoteException{
+    public String createUser(String username, String password, UUID userToken) throws RemoteException{
+        if(SessionAuth.validateSession(userToken)){
+            
         try{
             // Create file if it dosen't exist. Boolean in FileWriter makes sure we append to file and don't overwrite.
             File file = new File("password.txt");
@@ -235,11 +237,17 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
             }
 
             return "Account with Username: " + username + " already exists." + "\n";
+        }else{
+            return "Session Invalid";
+        }
     }
 
 
     public String login(String username, String password) throws RemoteException{
         boolean accepted = false;
+        if(SessionAuth.validateUser(username)){
+            return "User already logged in\n";
+        }
         try {
             // Setup read file.
             File myObj = new File("password.txt");
@@ -274,6 +282,19 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
         }else{
             return "Login failed, try again" + "\n";
         }
+    }
+
+    public UUID getUniqueUserIdentifier() {
+        return uniqueUserIdentifier;
+    }
+
+    public String logout(UUID userToken) {
+        if(SessionAuth.removeSession(userToken)){
+            return "Logout successful" + "\n";
+        }else{
+            return "Logout failed, try again" + "\n";
+        }
+
     }
 }
     
