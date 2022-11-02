@@ -12,7 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 import com.Domain.Parameter;
 import com.Domain.Printer;
 
-
 public class PrinterToClient extends UnicastRemoteObject implements ClientToPrinter { // Printer to Client interface
     private static final long serialVersionUID = 1L; // Serial version UID
     private List<Printer> printers = new ArrayList<>(); // List of printers
