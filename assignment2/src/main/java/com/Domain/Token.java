@@ -13,7 +13,7 @@ public class Token {
     public Token(UUID uniqueUserIdentifier, String user) {
         this.uniqueUserIdentifier = uniqueUserIdentifier;
         this.user = user;
-        this.expiryDate = LocalDateTime.now();
+        this.expiryDate = LocalDateTime.now(); // To control timeout of tokens
     }
 
     public String getUser() {

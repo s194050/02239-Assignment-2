@@ -17,6 +17,8 @@ public class Client
         boolean serverStatus = false; // Simple flag to hanldes server status
         UUID uniqueUserToken = null; // Used to store the UUID of the user
         Scanner scanner = new Scanner(System.in);
+
+        // Commonly used variables
         int selection;
         int job = 0;
         String username = "";
@@ -69,14 +71,14 @@ public class Client
                         "\t\t 9: Set a config parameter \n10: Exit Server GUI \n");
 
                 if (username.equals("root")) { // If the user is root, allow them to create users
-                    System.out.println("11: Create a user");
+                    System.out.println("11: Create a user\n");
                 }
 
                 selection = Integer.parseInt(scanner.next() + scanner.nextLine()); // Get the user input
 
                 switch (selection) { // Handle the selection
                     case 1:
-                        if (!serverStatus) {
+                        if (!serverStatus) { // Check if the server is already running
                             System.out.println(client1.Start(uniqueUserToken)); // Start the server
                             serverStatus = true;
                             break;
@@ -84,15 +86,17 @@ public class Client
                             System.out.println("Server has already started!\n");
                             break;
                         }
+
                     case 2:
-                        if (serverStatus) {
-                            client1.Stop(uniqueUserToken); // Stop the server
+                        if (serverStatus) { // Check if the server is not running
+                            System.out.println(client1.Stop(uniqueUserToken)); // Stop the server
                             serverStatus = false;
                             break;
                         } else {
                             System.out.println("Server is not running\n");
                             break;
                         }
+
                     case 3:
                         if (serverStatus) {
                             System.out.println("Restarting server\n");
@@ -102,6 +106,7 @@ public class Client
                             System.out.println("Server is not running\n");
                             break;
                         }
+
                     case 4:
                         if (serverStatus) {
                             getAvailablePrinters(client1, scanner); // Get available printers
@@ -115,7 +120,7 @@ public class Client
 
                             System.out.println("Enter the name of the file you want to print: ");
 
-                            String filename = scanner.next() + scanner.nextLine();
+                            String filename = scanner.next() + scanner.nextLine(); 
 
                             output = client1.print(filename, printer, uniqueUserToken); // Print the file
                             if(output.equals("Session Invalid")){ // If the session is invalid, break
@@ -124,7 +129,6 @@ public class Client
                                 break;
                             }else{
                                 System.out.println(output);
-
                                 break;
                             }
                         } else {
@@ -175,7 +179,7 @@ public class Client
                                 break;
                             }
 
-                            if (client1.getJobID(job, printer) == -1) {
+                            if (client1.getJobID(job, printer) == -1) { // Check if the job exists
                                 System.out.println("Job does not exist, try again\n");
                                 break;
                             }

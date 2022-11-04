@@ -14,7 +14,7 @@ public class SessionAuth {
     public static UUID createSession(String user) { // Create a session
         UUID uniqueUserIdentifier = UUID.randomUUID(); // Create a unique user identifier
         tokens.add(new Token(uniqueUserIdentifier, user)); // Add token to list of tokens
-        System.out.println(user + " logged in" + " with token " + uniqueUserIdentifier);
+        System.out.println(user + " logged in" + " with token " + uniqueUserIdentifier); // For testing purposes
         return uniqueUserIdentifier;
     }
 
@@ -39,7 +39,7 @@ public class SessionAuth {
     
 
     public static boolean validateSession(UUID uniqueUserIdentifier) { // Validate session
-        System.out.println("Validating session, with token: " + uniqueUserIdentifier + " Amount of tokens: " + tokens.size());
+        System.out.println("Validating session, with token: " + uniqueUserIdentifier + " Amount of tokens: " + tokens.size()); // For testing purposes
         for (Token token : tokens) { // Loop through tokens
             if (token.getUniqueUserIdentifier().equals(uniqueUserIdentifier)) {
                 return timeoutHandler(token); // Check if token has timed out

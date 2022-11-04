@@ -18,8 +18,6 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
     private List<Parameter> parameters = new ArrayList<>();
     private UUID uniqueUserIdentifier; // Unique user identifier
 
-    //private static boolean statusOfServer = false;
-
 
     public PrinterToClient(String name) throws RemoteException {
         super(); // Call to UnicastRemoteObject constructor
@@ -194,7 +192,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
 
 
     public String createUser(String username, String password, UUID userToken) throws RemoteException{
-        if(SessionAuth.validateSession(userToken)){
+        if(SessionAuth.validateSession(userToken)){ // Only allow a user to be created if session is valid
             
         try{
             // Create file if it dosen't exist. Boolean in FileWriter makes sure we append to file and don't overwrite.
@@ -245,7 +243,7 @@ public class PrinterToClient extends UnicastRemoteObject implements ClientToPrin
 
     public String login(String username, String password) throws RemoteException{
         boolean accepted = false;
-        if(SessionAuth.validateUser(username)){
+        if(SessionAuth.validateUser(username)){ // Check whether user is already logged in by looking for its username in the session list
             return "User already logged in\n";
         }
         try {
